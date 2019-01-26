@@ -1,5 +1,7 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import { MongoClient } from 'mongodb'
 
 import config from './config'
@@ -15,14 +17,19 @@ const dbOptions = {
 // Database
 MongoClient.connect(config.mongo.uri, dbOptions, async function (err, client) {
     if(err) throw err
-    console.log('Connected to database')
 
     // Initialization
     const db = client.db('test')
     const port = config.server.port
     const app = express()
 
-    // Use body parser so we can get info from POST and/or URL parameters
+    // Enable CORS
+    app.use(cors())
+
+    // Enable signed cookies
+    app.use(cookieParser(config.cookie.secret))
+
+    // Enable body parser so we can get info from POST and/or URL parameters
     app.use(bodyParser.urlencoded({ extended: false }))
     app.use(bodyParser.json())
 
@@ -35,10 +42,6 @@ MongoClient.connect(config.mongo.uri, dbOptions, async function (err, client) {
     if (collections.filter(x => x.name === 'reviews').length === 0) database.createCollection('reviews')
     if (collections.filter(x => x.name === 'tags').length === 0) database.createCollection('tags')
     if (collections.filter(x => x.name === 'users').length === 0) database.createCollection('users')
-
-    // Public headers
-    console.log('Init headers middleware...')
-    initRequestHeaders(app)
 
     // Authorize secured routes
     console.log('Init authorize middleware...')
