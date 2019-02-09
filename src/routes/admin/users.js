@@ -13,6 +13,17 @@ export default (app, database) => {
         }
     })
 
+    app.get('/admin/users/:id', async (req, res) => {
+        try {
+            const id = req.params.id
+            const data = await database.collection('users').findOne({ '_id': new ObjectId(id) })
+            res.status(200).send(data)
+        } catch (e) {
+            console.log(e)
+            res.status(500).send({ message: 'Could not get user.' })
+        }
+    })
+
     app.post('/admin/users', async (req, res) => {
         try {
             const { username, email, password } = req.body

@@ -12,6 +12,17 @@ export default (app, database) => {
         }
     })
 
+    app.get('/admin/tags/:id', async (req, res) => {
+        try {
+            const id = req.params.id
+            const data = await database.collection('tags').findOne({ '_id': new ObjectId(id) })
+            res.status(200).send(data)
+        } catch (e) {
+            console.log(e)
+            res.status(500).send({ message: 'Could not get tag.' })
+        }
+    })
+
     app.post('/admin/tags', async (req, res) => {
         try {
             const { title } = req.body

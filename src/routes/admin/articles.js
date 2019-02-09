@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb'
 import { isNil } from 'ramda'
 
 export default (app, database) => {
+
     app.get('/admin/articles', async (req, res) => {
         try {
             const data = await database.collection('articles').find().toArray()
@@ -9,6 +10,17 @@ export default (app, database) => {
         } catch (e) {
             console.log(e)
             res.status(500).send({ message: 'Could not get articles.' })
+        }
+    })
+
+    app.get('/admin/articles/:id', async (req, res) => {
+        try {
+            const id = req.params.id
+            const data = await database.collection('articles').findOne({ '_id': new ObjectId(id) })
+            res.status(200).send(data)
+        } catch (e) {
+            console.log(e)
+            res.status(500).send({ message: 'Could not get article.' })
         }
     })
 
@@ -22,7 +34,7 @@ export default (app, database) => {
                 author,
                 category,
                 tags,
-                isPublished: true,
+                isPublished: false,
                 createdAt: new Date()
             }
             const result = await database.collection('articles').insertOne(article)

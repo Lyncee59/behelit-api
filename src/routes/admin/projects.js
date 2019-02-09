@@ -12,6 +12,17 @@ export default (app, database) => {
         }
     })
 
+    app.get('/admin/projects/:id', async (req, res) => {
+        try {
+            const id = req.params.id
+            const data = await database.collection('projects').findOne({ '_id': new ObjectId(id) })
+            res.status(200).send(data)
+        } catch (e) {
+            console.log(e)
+            res.status(500).send({ message: 'Could not get project.' })
+        }
+    })
+
     app.post('/admin/projects', async (req, res) => {
         try {
             const { title, summary, description, company, year, tags } = req.body
@@ -22,7 +33,7 @@ export default (app, database) => {
                 company,
                 year,
                 tags,
-                isPublished: true,
+                isPublished: false,
                 createdAt: new Date()
             }
             const result = await database.collection('projects').insertOne(project)

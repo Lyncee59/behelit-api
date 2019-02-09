@@ -12,6 +12,17 @@ export default (app, database) => {
         }
     })
 
+    app.get('/admin/reviews/:id', async (req, res) => {
+        try {
+            const id = req.params.id
+            const data = await database.collection('reviews').findOne({ '_id': new ObjectId(id) })
+            res.status(200).send(data)
+        } catch (e) {
+            console.log(e)
+            res.status(500).send({ message: 'Could not get review.' })
+        }
+    })
+
     app.post('/admin/reviews', async (req, res) => {
         try {
             const { name, company, role, message } = req.body
